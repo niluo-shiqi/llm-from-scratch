@@ -7,10 +7,15 @@ idx_to_char={}
 def main():
     text = load_shakespeare()
     build_vocab(text)
-
     tokens=encode(text)
     print(f"Encoded {len(text)} characters into {len(tokens)} tokens")
     print(f"Vocab size: {len(char_to_idx)}")
+
+    # create dataset
+    sequence_length=256
+    contexts, targets = create_dataset(tokens, sequence_length)
+    print(f"Created {len(contexts)} training examples")
+
 
 
 # load shakespeare dataset
@@ -42,13 +47,26 @@ def build_vocab(text):
         idx_to_char.update({index: item})
         index+=1
 
+# return array of index numbers matched to given chars
 def encode(text_sample):
     return [char_to_idx[c] for c in text_sample]
 
+# create string of corresponding chars given array of index
 def decode(tokens):
     return ''.join([idx_to_char[i] for i in tokens])
-    
-        
+
+def create_dataset(tokens, seq_len):
+    contexts=[]
+    targets=[]
+
+    for i in range(len(tokens) - seq_len):
+        context = tokens[i : i+seq_len]
+        target = tokens[i+seq_len]
+        contexts.append(context)
+        targets.append(target)
+    return contexts, targets
+
+
 
 if __name__ == "__main__":
     main()
