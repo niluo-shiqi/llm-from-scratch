@@ -1,11 +1,17 @@
 import urllib.request
 import os
 
+char_to_idx={}
+idx_to_char={}
+
 def main():
     text = load_shakespeare()
-    print(f"loaded {len(text)} characters")
-    print("first 200 chars: ")
-    print(text[:200])
+    build_vocab(text)
+
+    tokens=encode(text)
+    print(f"Encoded {len(text)} characters into {len(tokens)} tokens")
+    print(f"Vocab size: {len(char_to_idx)}")
+
 
 # load shakespeare dataset
 def load_shakespeare():
@@ -24,6 +30,24 @@ def load_shakespeare():
     with open(txt_path, "r", encoding="utf-8") as f:
         text = f.read()
         return text
+
+# tokenization
+
+# get all unique characters from text, sort them, create dictionary from each char to an index and vice versa, print size of vocab
+def build_vocab(text):
+    unique_chars= sorted(set(text))
+    index=0
+    for item in unique_chars:
+        char_to_idx.update({item: index})
+        idx_to_char.update({index: item})
+        index+=1
+
+def encode(text_sample):
+    return [char_to_idx[c] for c in text_sample]
+
+def decode(tokens):
+    return ''.join([idx_to_char[i] for i in tokens])
+    
         
 
 if __name__ == "__main__":
