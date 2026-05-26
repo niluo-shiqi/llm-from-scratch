@@ -31,6 +31,9 @@ def main():
 
     train(model, contexts[:1000], targets[:1000], num_epochs=3)
 
+    sample_tokens = encode("T")
+    text = sample(model, sample_tokens, max_length=100)
+    print(text)
 
 
 # load shakespeare dataset
@@ -110,7 +113,22 @@ def train(model, contexts, targets, num_epochs=5):
             if (step % 100) == 0:
                 print(f"epoch: {epoch}, step: {step}, loss: {loss.item()}")
 
+def sample(model, starting_tokens, max_length):
 
+    #start with initial tokens
+    current_sequence = starting_tokens
+
+    # generate tokens one at a time
+    for i in range(max_length):
+
+        seq = torch.tensor(current_sequence)
+        logits = model(seq)
+        last_logit = logits[-1]
+        probs = torch.softmax(last_logit, dim=0)
+        sample_token = torch.multinomial(probs, 1).item() # need to extract scalar value from tensor
+        current_sequence.append(sample_token)
+    text = decode(current_sequence)
+    return text
 
 
 if __name__ == "__main__":
