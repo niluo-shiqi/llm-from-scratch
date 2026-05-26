@@ -24,10 +24,12 @@ def main():
     # take first context(256 tokens)
     sample_input=torch.tensor(contexts[0]) # convert to tensor
     logits = model(sample_input)
-    
+
     print(f"Input shape: {sample_input.shape}")
     print(f"Logits shape: {logits.shape}")
     print(f"Expected: [256, 65]")
+
+    train(model, contexts[:1000], targets[:1000], num_epochs=3)
 
 
 
@@ -78,6 +80,36 @@ def create_dataset(tokens, seq_len):
         contexts.append(context)
         targets.append(target)
     return contexts, targets
+
+def train(model, contexts, targets, num_epochs=5):
+    optimizer = torch.optim.Adam(model.parameters(), lr = 0.001) # create optimizer
+    loss_fn = torch.nn.CrossEntropyLoss() # create loss function
+
+    for epoch in range(num_epochs):
+        for step, (context, target) in enumerate(zip(contexts, targets)):
+
+            # forward pass
+            context = torch.tensor(context)
+            target = torch.tensor(target)
+            logits = model(context)
+            last_logit = logits[-1]
+
+            #compute loss
+            loss = loss_fn(last_logit, target)
+            
+            # clear for next step
+            optimizer.zero_grad() 
+
+            # backward pass
+            loss.backward()
+
+            # update weights
+            optimizer.step() 
+
+            #print progress every 100 steps
+            if (step % 100) == 0:
+                print(f"epoch: {epoch}, step: {step}, loss: {loss.item()}")
+
 
 
 
