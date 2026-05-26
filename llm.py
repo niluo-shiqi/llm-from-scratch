@@ -1,5 +1,7 @@
 import urllib.request
 import os
+import torch
+from model import TinyLLM
 
 char_to_idx={}
 idx_to_char={}
@@ -15,6 +17,17 @@ def main():
     sequence_length=256
     contexts, targets = create_dataset(tokens, sequence_length)
     print(f"Created {len(contexts)} training examples")
+
+    # test the model
+    model = TinyLLM(vocab_size=len(char_to_idx), embedding_dim=64, num_layers=4)
+
+    # take first context(256 tokens)
+    sample_input=torch.tensor(contexts[0]) # convert to tensor
+    logits = model(sample_input)
+    
+    print(f"Input shape: {sample_input.shape}")
+    print(f"Logits shape: {logits.shape}")
+    print(f"Expected: [256, 65]")
 
 
 
