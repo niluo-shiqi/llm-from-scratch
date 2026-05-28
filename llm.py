@@ -19,7 +19,7 @@ def main():
     print(f"Created {len(contexts)} training examples")
 
     # test the model
-    model = TinyLLM(vocab_size=len(char_to_idx), embedding_dim=64, num_layers=4)
+    model = TinyLLM(vocab_size=len(char_to_idx), embedding_dim=128, num_layers=8)
 
     # take first context(256 tokens)
     sample_input=torch.tensor(contexts[0]) # convert to tensor
@@ -29,7 +29,7 @@ def main():
     print(f"Logits shape: {logits.shape}")
     print(f"Expected: [256, 65]")
 
-    train(model, contexts[:1000], targets[:1000], num_epochs=3)
+    train(model, contexts[:10000], targets[:10000], num_epochs=3)
 
     sample_tokens = encode("T")
     text = sample(model, sample_tokens, max_length=100)
